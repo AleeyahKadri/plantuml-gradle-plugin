@@ -59,7 +59,6 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.jacocoTestReport {
-    executionData(tasks.withType<Test>())
     reports {
         xml.isEnabled = true
     }
@@ -131,22 +130,25 @@ extensions.configure<Any>("classDiagram") {
     }
 }
 
-// Note: The plantuml extension configuration is challenging to convert to Kotlin DSL
-// due to the dynamic nature of Groovy closures and NamedDomainObjectContainers.
-// The original Groovy configuration was:
-// plantuml {
-//     options {
-//         outputDir = project.file('diagrams')
-//     }
-//     diagrams {
-//         classes {
-//             sourceFile = project.file('diagrams/class_diagram.plantuml')
-//         }
-//     }
-// }
-// This can be configured using project properties or a separate Groovy script if needed.
-
 afterEvaluate {
+    extensions.configure<Any>("plantuml") {
+        (this as groovy.lang.GroovyObject).apply {
+            // Configure options
+            getProperty("options").also { options ->
+                (options as groovy.lang.GroovyObject).setProperty("outputDir", project.file("diagrams"))
+            }
+            
+            // Configure diagrams
+            getProperty("diagrams").also { diagrams ->
+                @Suppress("UNCHECKED_CAST")
+                val diagramsContainer = diagrams as org.gradle.api.NamedDomainObjectContainer<*>
+                diagramsContainer.maybeCreate("classes").also { diagram ->
+                    (diagram as groovy.lang.GroovyObject).setProperty("sourceFile", project.file("diagrams/class_diagram.plantuml"))
+                }
+            }
+        }
+    }
+    
     tasks.findByName("generateDiagramClasses")?.let {
         it.dependsOn(tasks.named("buildClassDiagram"))
     }
