@@ -51,13 +51,13 @@ tasks.withType<Test> {
 tasks.named<GroovyCompile>("compileGroovy") {
     val compileKotlin = tasks.named<KotlinCompile>("compileKotlin")
     dependsOn(compileKotlin)
-    classpath += files(compileKotlin.get().destinationDir)
+    classpath += files(compileKotlin.get().destinationDirectory.get().asFile)
 }
 
 tasks.named<GroovyCompile>("compileTestGroovy") {
     val compileTestKotlin = tasks.named<KotlinCompile>("compileTestKotlin")
     dependsOn(compileTestKotlin)
-    classpath += files(compileTestKotlin.get().destinationDir)
+    classpath += files(compileTestKotlin.get().destinationDirectory.get().asFile)
 }
 
 tasks.named<KotlinCompile>("compileKotlin") {
@@ -119,7 +119,7 @@ pluginBundle {
     )
 
     plugins {
-        named("plantUmlPlugin") {
+        getByName("plantUmlPlugin") {
             displayName = "PlantUML plugin"
             description = "Gradle plugin to build PlantUML diagrams from code (for living and up-to-date documentation)"
         }
