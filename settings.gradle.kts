@@ -3,5 +3,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'plantuml-gradle-plugin'
 
+rootProject.name = "plantuml-gradle-plugin"
